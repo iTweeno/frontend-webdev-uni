@@ -1,0 +1,12 @@
+button {
+  border-radius: 8px;
+  background-color: orange;
+  padding: 10px;
+  display: inline-block;
+  text-align: center;
+  margin: 5px;
+  outline: none;
+  box-shadow: none;
+  outline-color: transparent;
+  color: black;
+}

@@ -1,0 +1,14 @@
+.messageWrapper {
+  font-size: 70px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.messageWrapper h1 {
+  color: white;
+}
+
+.messageWrapper button {
+  margin-top: 10px;
+}

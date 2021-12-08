@@ -1,0 +1,14 @@
+.listingList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  color: white;
+  font-size: 25px;
+}
+
+.foundListingsTitle {
+  text-align: center;
+  color: white;
+  font-size: 70px;
+}

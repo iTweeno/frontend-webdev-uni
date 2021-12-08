@@ -1,0 +1,16 @@
+.listingInfo {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+  margin-top: 20px;
+  background-color: #4c4c4c;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.description {
+  max-width: 35ch;
+  color: grey;
+}

@@ -1,0 +1,29 @@
+.navbar {
+  background-color: rgba(0, 0, 0, 0.2);
+  position: sticky;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  font-size: 20px;
+}
+
+.navbar button:focus {
+  outline: none;
+  box-shadow: none;
+  outline-color: transparent;
+}
+
+.logo {
+  height: 60px;
+  width: 60px;
+}
+.logged_in {
+  display: flex;
+  flex-direction: row;
+  margin-right: 10px;
+}
+
+.logged_in_text {
+  padding-top: 15px;
+  color: white;
+}
