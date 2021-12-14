@@ -11,6 +11,8 @@ import { Routes } from "react-router";
 import { useSession } from "./contexts/SessionContext";
 import PostListing from "./views/PostListing";
 import MessageOrReport from "./views/MessageOrReport";
+import MessageThread from "./views/MessageThread";
+import Profile from "./views/Profile";
 
 const App = () => {
   const { session } = useSession();
@@ -29,7 +31,9 @@ const App = () => {
             <Route path="/listings" element={<Listings />} />
             <Route path="/listing" element={<Listing />} />
             <Route path="/postListing" element={<PostListing />} />
-            <Route path="/message" element={<MessageOrReport />} />
+            <Route path="/sendMessage" element={<MessageOrReport />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/messagethread" element={<MessageThread />} />
           </Routes>
         </div>
       </div>

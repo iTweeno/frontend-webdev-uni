@@ -7,7 +7,7 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   const onSubmit = (values) => {
-    navigate(`/listings?title=${values.title}`);
+    navigate(`/listings?title=${values.title}&skip=0`);
   };
 
   return (

@@ -12,3 +12,41 @@
   color: white;
   font-size: 70px;
 }
+
+.pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  list-style: none;
+  margin-top: 20px;
+  padding: 0;
+}
+
+.pagination a {
+  cursor: default;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid orange;
+  color: white;
+  margin-left: 10px;
+ }
+ 
+ .pagination li:not(.disabled) a:hover {
+  background-color: bisque;
+  cursor: pointer;
+ }
+ 
+ .pagination li a {
+  font-weight: bold;
+ }
+ 
+ .pagination li.active a {
+  color: #fff;
+  background: orange;
+ }
+ 
+ .pagination li.disabled a {
+  pointer-events: none;
+  color: white;
+  border: 1px solid orange;
+ }

@@ -6,6 +6,7 @@ import { useSession } from "../contexts/SessionContext";
 
 const Navbar = () => {
   const { session, logout } = useSession();
+  const navigate = useNavigate();
   return (
     <div className="navbar">
       <Link to="/">
@@ -23,15 +24,16 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="logged_in">
-            <Link to="/profile" className="logged_in_text">
+            <Link to="/profile?type=messages" className="logged_in_text">
               <h1>{`${session.data.first_name}'s account`}</h1>
             </Link>
             <Link to="/postListing">
               <button>Post a Listing!</button>
             </Link>
-            <button onClick={() => logout().then(() => navigate("/"))}>
-              Logout
-            </button>
+            <button onClick={() => {
+              logout()
+              navigate("/")
+            }}>Logout</button>
           </div>
         )}
       </div>

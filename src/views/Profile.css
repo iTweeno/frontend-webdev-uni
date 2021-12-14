@@ -1,0 +1,42 @@
+.profileWrapper {
+  border-style: groove;
+  display: flex;
+  justify-content: space-around;
+  color: white;
+  font-size: 70px;
+  margin-top: 20px;
+  margin: 20px;
+}
+
+.editProfileButton {
+  margin-top: 20px;
+}
+
+.options {
+  border: 1px solid orange;
+  background-color: #4c4c4c;
+  border-radius: 10%;
+  margin-left: 20px;
+  padding: 10px;
+}
+
+.message {
+  padding: 10px;
+}
+
+.messagesWrapper {
+  background-color: #4c4c4c;
+  border-radius: 2%;
+}
+
+.messageContent {
+  font-size: 50px;
+}
+
+.message {
+  max-width: 20ch;
+}
+
+.authorTime {
+  font-size: 20px;
+}

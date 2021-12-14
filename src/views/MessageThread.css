@@ -1,0 +1,35 @@
+.singleMessage {
+  color: white;
+  font-size: 40px;
+  max-width: 35ch;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.userIsMessenger {
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-right: 10px;
+  background-color: orange;
+}
+
+.userIsReceiver {
+  margin-left: 10px;
+  background-color: #4c4c4c;
+}
+
+.sendText {
+  font-size: 70px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 10px;
+}
+.sendText button {
+  vertical-align: middle;
+}

@@ -1,26 +1,40 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import ReactPaginate from "react-paginate";
 import "./Listings.css";
 import SingleListingForList from "../components/SingleListingForList.jsx";
 
 const Listings = () => {
   const [data, setData] = useState(null);
   const query = new URLSearchParams(window.location.search);
-  useEffect(async () => {
-    const response = await fetch(
-      `https://127.0.0.1:8393/api/ad?title=${query.get("title")}&skip=0`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        credentials: "include",
-      }
-    );
+  const navigate = useNavigate();
+  const title = query.get("title");
+  let skip = query.get("skip");
+
+  const clickPagination = async (event) => {
+    skip = event.selected;
+    navigate(`/listings?title=${title}&skip=${event.selected}`);
+    getData()
+  };
+
+  const getData = async () => {
+    const response = await fetch(`https://127.0.0.1:8393/api/ad?title=${title}&skip=${skip}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+    });
     if (response.status == 204) {
-      setData(1);
+      return setData(1);
     }
-    setData(await response.json());
+    const responseJson = (await response.json()).data;
+
+    setData(responseJson.data);
+  };
+
+  useEffect(async () => {
+    getData();
   }, []);
 
   if (!data) {
@@ -32,7 +46,7 @@ const Listings = () => {
     <div>
       <h1 className="foundListingsTitle">Found ads for criteria:</h1>
       <div className="listingList">
-        {data.data.map((e) => (
+        {data.map((e) => (
           <Link to={`/listing?id=${e.id}`} key={e.id}>
             <SingleListingForList
               title={e.title}
@@ -45,6 +59,14 @@ const Listings = () => {
           </Link>
         ))}
       </div>
+      <ReactPaginate
+        previousLabel={"prev"}
+        nextLabel={"next"}
+        pageCount={Math.ceil(/*data.count / 10*/ 2)}
+        onPageChange={clickPagination}
+        containerClassName={"pagination"}
+        activeClassName={"active"}
+      />
     </div>
   );
 };
