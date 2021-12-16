@@ -6,6 +6,25 @@ on:
       - master
 
 jobs:
+  test-build:
+    name: Test build
+    runs-on: ubuntu-latest
+    container:
+      image: node
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        uses: borales/actions-yarn@v2.1.0
+        with:
+          cmd: install
+      - name: Install vite
+        uses: borales/actions-yarn@v2.1.0
+        with:
+          cmd: global add vite
+      - name: Tests
+        uses: borales/actions-yarn@v2.1.0
+        with:
+          cmd: build
   build:
     name: Build docker container
     runs-on: ubuntu-latest

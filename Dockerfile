@@ -3,7 +3,7 @@ FROM node:16-buster
 WORKDIR /app
 
 COPY . .
-RUN yarn --production --frozen-lockfile --ignore-scripts
+RUN yarn
 RUN yarn config set unsafe-perm true
 RUN yarn global add vite
 RUN yarn build
