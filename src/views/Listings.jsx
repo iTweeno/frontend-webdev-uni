@@ -13,7 +13,7 @@ const Listings = () => {
 
   const clickPagination = async (event) => {
     skip = event.selected;
-    navigate(`/listings?title=${title}&skip=${event.selected}`);
+    navigate(`/listings?title=${title}&skip=${skip}`);
     getData()
   };
 
@@ -30,7 +30,7 @@ const Listings = () => {
     }
     const responseJson = (await response.json()).data;
 
-    setData(responseJson.data);
+    setData(responseJson);
   };
 
   useEffect(async () => {
@@ -46,12 +46,13 @@ const Listings = () => {
     <div>
       <h1 className="foundListingsTitle">Found ads for criteria:</h1>
       <div className="listingList">
-        {data.map((e) => (
+        {data.data.map((e) => (
           <Link to={`/listing?id=${e.id}`} key={e.id}>
             <SingleListingForList
               title={e.title}
               salary={`${e.salary}${e.currency}`}
               location={e.location}
+              type={e.ad_type}
               description={e.description}
               company={e.company}
               key={e.id}
@@ -62,7 +63,7 @@ const Listings = () => {
       <ReactPaginate
         previousLabel={"prev"}
         nextLabel={"next"}
-        pageCount={Math.ceil(/*data.count / 10*/ 2)}
+        pageCount={Math.ceil(data.count / 10)}
         onPageChange={clickPagination}
         containerClassName={"pagination"}
         activeClassName={"active"}

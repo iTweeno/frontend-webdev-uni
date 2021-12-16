@@ -42,7 +42,11 @@ const Listing = () => {
     <div className="listingWrapper">
       <ListingFields objKey="Title" value={data.title} />
       <ListingFields objKey="Location" value={`${data.location}`} />
-      <ListingFields objKey="Salary" value={`${data.salary}${data.currency}`} />
+      {data.ad_type === "paid" ? (
+        <ListingFields objKey="Salary" value={`${data.salary}${data.currency}`} />
+      ) : (
+        <ListingFields objKey="Type" value={`${data.ad_type.charAt(0).toUpperCase() + data.ad_type.slice(1)}`} />
+      )}
       <ListingFields objKey="Description" value={data.description} />
       <ListingFields objKey="Ad Owner" value={`${data.userr.first_name} ${data.userr.last_name}`} />
       <ListingFields objKey="Company" value={data.userr.company} />

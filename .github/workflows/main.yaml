@@ -1,0 +1,21 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build docker container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to github docker
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build docker image
+        run: docker build -t matchmakerbot .
+      - name: Docker tag
+        run: docker tag matchmakerbot ${{ secrets.DOCKER_USER }}/frontend-webdev-uni:latest
+      - name: Push docker image
+        run: docker push ${{ secrets.DOCKER_USER }}/frontend-webdev-uni:latest

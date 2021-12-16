@@ -1,8 +1,10 @@
 import "./PostListing.css";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 const PostListing = () => {
+  const [dataType, setDataType] = useState(null);
   const {
     handleSubmit,
     register,
@@ -12,7 +14,6 @@ const PostListing = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
-    console.log(values);
     await fetch(`https://127.0.0.1:8393/api/ad`, {
       method: "POST",
       headers: {
@@ -26,6 +27,7 @@ const PostListing = () => {
         currency: values.currency,
         description: values.description,
         location: values.location,
+        ad_type: dataType,
       }),
     })
       .then(async (e) => {
@@ -52,10 +54,7 @@ const PostListing = () => {
   const addInput = (placeholder, name, message) => {
     return (
       <div className="individualInputs">
-        <input
-          placeholder={placeholder}
-          {...registerInput(name, message, true)}
-        />
+        <input placeholder={placeholder} {...registerInput(name, message, true)} />
         {errors[name] && <small>{errors[name].message}</small>}
       </div>
     );
@@ -71,21 +70,23 @@ const PostListing = () => {
             {addInput("Salary", "salary", "Enter Salary")}
             {addInput("Currency", "currency", "Enter Currency")}
             {addInput("Location", "location", "Enter Location")}
+            <div className="dropdown">
+              <button className="dropbtn">Type</button>
+              <div className="dropdown-content">
+                <button onClick={() => setDataType("paid")}>Paid</button>
+                <button onClick={() => setDataType("internship")}>Internship</button>
+                <button onClick={() => setDataType("volunteering")}>Volunteering</button>
+              </div>
+            </div>
             <div className="individualInputs">
               <textarea
                 className="descriptionInput"
                 placeholder="Description"
                 {...registerInput("description", "Enter description", true)}
               />
-              {errors.description && (
-                <small>{errors.description.message}</small>
-              )}
+              {errors.description && <small>{errors.description.message}</small>}
             </div>
-            <button
-              className="postListingButton"
-              type="submit"
-              disabled={isSubmitting}
-            >
+            <button className="postListingButton" type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Posting listing..." : "Post listing!"}
             </button>
           </div>

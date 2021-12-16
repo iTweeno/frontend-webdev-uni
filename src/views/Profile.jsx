@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./Profile.css";
 import { useSession } from "../contexts/SessionContext";
+import SingleListingForList from "../components/SingleListingForList.jsx";
 
 const Profile = () => {
   const query = new URLSearchParams(window.location.search);
@@ -14,36 +15,57 @@ const Profile = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const [data, setData] = useState([]);
+  const [dataMessages, setDataMessages] = useState([]);
+
+  const [adToEdit, setadToEdit] = useState(null);
+
+  const [dataType, setDataType] = useState(null);
+
+  const [dataListings, setdataListings] = useState([]);
 
   const navigate = useNavigate();
 
   const { session } = useSession();
 
-  useEffect(async () => {
-    if (query.get("type") === "messages") {
-      const response = await fetch(`https://127.0.0.1:8393/api/message/allMessages?id=${session.data.id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        credentials: "include",
-      });
+  const type = query.get("type");
 
-      if (response.status == 204) {
-        setData([]);
-      }
-      const responseArr = (await response.json()).data;
-      const sortedArray = responseArr
-        .filter(
-          (e, i) =>
-            responseArr.indexOf(
-              responseArr.find((ee) => [ee.messenger, ee.receiver].includes(e.messenger) && e.ad_id === ee.ad_id)
-            ) === i
-        );
-        console.log(sortedArray)
-      setData(sortedArray);
+  useEffect(async () => {
+    const responseMessages = await fetch(`https://127.0.0.1:8393/api/message/allMessages?id=${session.data.id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+    });
+
+    if (responseMessages.status == 204) {
+      setDataMessages([]);
     }
+    const responseArrMessages = (await responseMessages.json()).data;
+    const sortedArray = responseArrMessages.filter(
+      (e, i) =>
+        responseArrMessages.indexOf(
+          responseArrMessages.find((ee) => [ee.messenger, ee.receiver].includes(e.messenger) && e.ad_id === ee.ad_id)
+        ) === i
+    );
+
+    setDataMessages(sortedArray);
+
+    const responseListings = await fetch(`https://127.0.0.1:8393/api/ad?owner=${session.data.id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+    });
+
+    const value = await responseListings.json();
+
+    if (responseListings.status == 204) {
+      setdataListings([]);
+    }
+
+    setdataListings(value.data);
   }, []);
 
   const registerInput = (name, message, value) => {
@@ -53,6 +75,15 @@ const Profile = () => {
         value,
       },
     });
+  };
+
+  const addInput = (placeholder, name, message) => {
+    return (
+      <div className="individualInputs">
+        <input placeholder={placeholder} {...registerInput(name, message, true)} />
+        {errors[name] && <small>{errors[name].message}</small>}
+      </div>
+    );
   };
 
   const submitProfileChange = async (values) => {
@@ -82,6 +113,36 @@ const Profile = () => {
       });
   };
 
+  const submitListingChanges = async (values) => {
+    await fetch(`https://127.0.0.1:8393/api/ad?id=${adToEdit}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+      body: JSON.stringify({
+        title: values.title,
+        salary: values.salary,
+        currency: values.currency,
+        description: values.description,
+        location: values.location,
+        ad_type: dataType,
+      }),
+    })
+      .then(async (e) => {
+        if (!e.ok) {
+          return setError("password", {
+            message: (await e.json()).message,
+          });
+        }
+        navigate("/");
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
+
   return (
     <div className="profileWrapper">
       <div className="leftSide">
@@ -98,7 +159,7 @@ const Profile = () => {
         </div>
       </div>
       <div className="rightSide">
-        {query.get("type") === "editprofile" ? (
+        {type === "editprofile" ? (
           <form className="rightSide" onSubmit={handleSubmit(submitProfileChange)}>
             <div className="inputs">
               <input
@@ -142,10 +203,11 @@ const Profile = () => {
               {isSubmitting ? "Editing profile..." : "Edit Profile"}
             </button>
           </form>
-        ) : query.get("type") === "messages" ? (
+        ) : type === "messages" ? (
           <div className="messagesWrapper">
-            {data.map((e) => (
+            {dataMessages.map((e) => (
               <Link
+                key={e.id}
                 to={`/messagethread?otherUser=${
                   e.userr_message_messengerTouserr.id === session.data.id ? e.receiver : e.messenger
                 }&adId=${e.ad_id}`}
@@ -158,15 +220,60 @@ const Profile = () => {
                   <h1 className="authorTime">
                     Sent by:
                     {`${e.userr_message_messengerTouserr.first_name} ${e.userr_message_messengerTouserr.last_name} ${
-                          e.userr_message_messengerTouserr.last_name
-                        }\n ${new Intl.DateTimeFormat("en-GB", {
-                          dateStyle: "full",
-                          timeStyle: "long",
-                        }).format(new Date(e.sent_at))}`}
+                      e.userr_message_messengerTouserr.last_name
+                    }\n ${new Intl.DateTimeFormat("en-GB", {
+                      dateStyle: "full",
+                      timeStyle: "long",
+                    }).format(new Date(e.sent_at))}`}
                   </h1>
                 </div>
               </Link>
             ))}
+          </div>
+        ) : type === "editlistings" ? (
+          <div className="editListingWrapper">
+            <div className="listings">
+              {dataListings.map((e) => (
+                <button onClick={() => setadToEdit(e.id)}>
+                  <SingleListingForList
+                    title={e.title}
+                    salary={`${e.salary}${e.currency}`}
+                    location={e.location}
+                    type={e.ad_type}
+                    description={e.description}
+                    company={e.company}
+                    key={e.id}
+                  />
+                </button>
+              ))}
+            </div>
+            <form onSubmit={handleSubmit(submitListingChanges)}>
+              <div className="inputs">
+                {addInput("Title", "title", "Enter title")}
+                {addInput("Salary", "salary", "Enter Salary")}
+                {addInput("Currency", "currency", "Enter Currency")}
+                {addInput("Location", "location", "Enter Location")}
+                <div className="dropdown">
+                  <button className="dropbtn">Type</button>
+                  <div className="dropdown-content">
+                    <button type="button" onClick={() => setDataType("paid")}>Paid</button>
+                    <button type="button" onClick={() => setDataType("internship")}>Internship</button>
+                    <button type="button" onClick={() => setDataType("volunteering")}>Volunteering</button>
+                  </div>
+                </div>
+                <div className="individualInputs">
+                  <textarea
+                    className="descriptionInput"
+                    placeholder="Description"
+                    {...registerInput("description", "Enter description", true)}
+                  />
+                  {errors.description && <small>{errors.description.message}</small>}
+                </div>
+                <button className="postListingButton" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Edit listing..." : "Edit listing!"}
+                </button>
+              </div>
+            </form>
           </div>
         ) : (
           ""

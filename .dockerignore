@@ -1,0 +1,7 @@
+**
+!/src/**
+!/public/**
+!package.json
+!yarn.lock
+!index.html
+!vite.config.js
