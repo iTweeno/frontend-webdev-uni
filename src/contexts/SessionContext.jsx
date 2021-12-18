@@ -8,7 +8,7 @@ export const SessionContextProvider = ({ children }) => {
   const [session, setSession] = react.useState(null);
 
   const refreshSession = async () => {
-    return fetch(`https://127.0.0.1:8393/api/user/`, {
+    return fetch(`https://localhost:8393/api/user/`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -24,7 +24,7 @@ export const SessionContextProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch("https://127.0.0.1:8393/api/user/logout", {
+    await fetch(`https://localhost:8393/api/user/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,9 +39,5 @@ export const SessionContextProvider = ({ children }) => {
     refreshSession();
   }, []);
 
-  return (
-    <SessionContext.Provider value={{ session, refreshSession, logout }}>
-      {children}
-    </SessionContext.Provider>
-  );
+  return <SessionContext.Provider value={{ session, refreshSession, logout }}>{children}</SessionContext.Provider>;
 };
