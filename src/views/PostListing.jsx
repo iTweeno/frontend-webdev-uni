@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 const PostListing = () => {
-  const [dataType, setDataType] = useState(null);
   const {
     handleSubmit,
     register,
@@ -27,7 +26,7 @@ const PostListing = () => {
         currency: values.currency,
         description: values.description,
         location: values.location,
-        ad_type: dataType,
+        ad_type: values.type,
       }),
     })
       .then(async (e) => {
@@ -70,13 +69,13 @@ const PostListing = () => {
             {addInput("Salary", "salary", "Enter Salary")}
             {addInput("Currency", "currency", "Enter Currency")}
             {addInput("Location", "location", "Enter Location")}
-            <div className="dropdown">
-              <button className="dropbtn">Type</button>
-              <div className="dropdown-content">
-                <button onClick={() => setDataType("paid")}>Paid</button>
-                <button onClick={() => setDataType("internship")}>Internship</button>
-                <button onClick={() => setDataType("volunteering")}>Volunteering</button>
-              </div>
+            <div className="individualInputs">
+              <label for="type">Select type of ad:</label>
+              <select {...registerInput("type", "Insert input", true)}>
+                <option value="paid">Paid</option>
+                <option value="internship">Internship</option>
+                <option value="volunteering">Volunteering</option>
+              </select>
             </div>
             <div className="individualInputs">
               <textarea

@@ -24,7 +24,7 @@ const MessageThread = () => {
   const [data, setData] = useState([]);
   useEffect(async () => {
     const response = await fetch(
-      `https://127.0.0.1:8393/api/message/allMessages?id=${session.data.id}&otherid=${otherUser}&adId=${adId}`,
+      `https://127.0.0.1:8393/api/message/allMessages?userId=${session.data.id}&otherid=${otherUser}&adId=${adId}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -58,6 +58,15 @@ const MessageThread = () => {
         ad_id: adId,
       }),
     });
+    const newMessages = [...data];
+    newMessages.push({
+      messenger: session.data.id,
+      receiver: otherUser,
+      message_content: values.message,
+      ad_id: adId,
+      sent_at: new Date(Date.now()),
+    });
+    setData(newMessages);
     navigate(`/messageThread?otherUser=${otherUser}&adId=${adId}`);
   };
 

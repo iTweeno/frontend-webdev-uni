@@ -9,7 +9,7 @@ const Listing = () => {
   const navigate = useNavigate();
   const { session } = useSession();
   useEffect(async () => {
-    const response = await fetch(`https://127.0.0.1:8393/api/ad?id=${query.get("id")}`, {
+    const response = await fetch(`https://127.0.0.1:8393/api/ad?adId=${query.get("id")}`, {
       headers: {
         "Content-Type": "application/json",
       },

@@ -17,9 +17,7 @@ const Profile = () => {
 
   const [dataMessages, setDataMessages] = useState([]);
 
-  const [adToEdit, setadToEdit] = useState(null);
-
-  const [dataType, setDataType] = useState(null);
+  const [adSelected, setAdSelected] = useState(null);
 
   const [dataListings, setdataListings] = useState([]);
 
@@ -30,7 +28,7 @@ const Profile = () => {
   const type = query.get("type");
 
   useEffect(async () => {
-    const responseMessages = await fetch(`https://127.0.0.1:8393/api/message/allMessages?id=${session.data.id}`, {
+    const responseMessages = await fetch(`https://127.0.0.1:8393/api/message/allMessages?userId=${session.data.id}`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -87,7 +85,7 @@ const Profile = () => {
   };
 
   const submitProfileChange = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/user?id=${session.data.id}`, {
+    await fetch(`https://127.0.0.1:8393/api/user?userId=${session.data.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -113,8 +111,25 @@ const Profile = () => {
       });
   };
 
+  const deleteAd = async () => {
+    await fetch(`https://127.0.0.1:8393/api/ad?adId=${adSelected}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+    })
+      .then(() => {
+        navigate("/profile?type=editlistings");
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
+
   const submitListingChanges = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/ad?id=${adToEdit}`, {
+    await fetch(`https://127.0.0.1:8393/api/ad?adId=${adSelected}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +142,7 @@ const Profile = () => {
         currency: values.currency,
         description: values.description,
         location: values.location,
-        ad_type: dataType,
+        ad_type: values.type,
       }),
     })
       .then(async (e) => {
@@ -234,7 +249,7 @@ const Profile = () => {
           <div className="editListingWrapper">
             <div className="listings">
               {dataListings.map((e) => (
-                <button onClick={() => setadToEdit(e.id)}>
+                <button onClick={() => setAdSelected(e.id)}>
                   <SingleListingForList
                     title={e.title}
                     salary={`${e.salary}${e.currency}`}
@@ -253,13 +268,13 @@ const Profile = () => {
                 {addInput("Salary", "salary", "Enter Salary")}
                 {addInput("Currency", "currency", "Enter Currency")}
                 {addInput("Location", "location", "Enter Location")}
-                <div className="dropdown">
-                  <button className="dropbtn">Type</button>
-                  <div className="dropdown-content">
-                    <button type="button" onClick={() => setDataType("paid")}>Paid</button>
-                    <button type="button" onClick={() => setDataType("internship")}>Internship</button>
-                    <button type="button" onClick={() => setDataType("volunteering")}>Volunteering</button>
-                  </div>
+                <div className="individualInputs">
+                  <label>Select type of ad:</label>
+                  <select {...registerInput("type", "Insert input", true)}>
+                    <option value="paid">Paid</option>
+                    <option value="internship">Internship</option>
+                    <option value="volunteering">Volunteering</option>
+                  </select>
                 </div>
                 <div className="individualInputs">
                   <textarea
@@ -271,6 +286,9 @@ const Profile = () => {
                 </div>
                 <button className="postListingButton" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? "Edit listing..." : "Edit listing!"}
+                </button>
+                <button className="deleteAdButton" type="a" onClick={deleteAd}>
+                  Delete Ad!
                 </button>
               </div>
             </form>
