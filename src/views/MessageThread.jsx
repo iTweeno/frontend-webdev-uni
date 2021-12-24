@@ -38,8 +38,6 @@ const MessageThread = () => {
       setData([]);
     }
     const responseArr = (await response.json()).data;
-    console.log(session.data.id);
-    console.log(otherUser);
     setData(responseArr);
   }, []);
 

@@ -48,7 +48,14 @@ const Listing = () => {
         <ListingFields objKey="Type" value={`${data.ad_type.charAt(0).toUpperCase() + data.ad_type.slice(1)}`} />
       )}
       <ListingFields objKey="Description" value={data.description} />
-      <ListingFields objKey="Ad Owner" value={`${data.userr.first_name} ${data.userr.last_name}`} />
+      <div>
+        <div className="keyValue">
+          <h1 className="key">Ad Owner</h1>
+          <h1 className="value">{`${data.userr.first_name} ${data.userr.last_name}`}</h1>
+          <img src={`data:image/jpeg;base64,${data.userr.image}`} />
+        </div>
+        <hr />
+      </div>
       <ListingFields objKey="Company" value={data.userr.company} />
       <ListingFields
         objKey="Last time updated"

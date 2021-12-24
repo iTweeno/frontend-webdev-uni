@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import fileDownload from "js-file-download";
 import { useState, useEffect } from "react";
 import "./Profile.css";
 import { useSession } from "../contexts/SessionContext";
@@ -18,6 +19,8 @@ const Profile = () => {
   const [dataMessages, setDataMessages] = useState([]);
 
   const [adSelected, setAdSelected] = useState(null);
+
+  const [dataReports, setReports] = useState([]);
 
   const [dataListings, setdataListings] = useState([]);
 
@@ -38,16 +41,17 @@ const Profile = () => {
 
     if (responseMessages.status == 204) {
       setDataMessages([]);
-    }
-    const responseArrMessages = (await responseMessages.json()).data;
-    const sortedArray = responseArrMessages.filter(
-      (e, i) =>
-        responseArrMessages.indexOf(
-          responseArrMessages.find((ee) => [ee.messenger, ee.receiver].includes(e.messenger) && e.ad_id === ee.ad_id)
-        ) === i
-    );
+    } else {
+      const responseArrMessages = (await responseMessages.json()).data;
+      const sortedArray = responseArrMessages.filter(
+        (e, i) =>
+          responseArrMessages.indexOf(
+            responseArrMessages.find((ee) => [ee.messenger, ee.receiver].includes(e.messenger) && e.ad_id === ee.ad_id)
+          ) === i
+      );
 
-    setDataMessages(sortedArray);
+      setDataMessages(sortedArray);
+    }
 
     const responseListings = await fetch(`https://127.0.0.1:8393/api/ad?owner=${session.data.id}`, {
       headers: {
@@ -61,9 +65,27 @@ const Profile = () => {
 
     if (responseListings.status == 204) {
       setdataListings([]);
+    } else {
+      setdataListings(value.data);
     }
 
-    setdataListings(value.data);
+    if (session.data.user_type === "admin") {
+      const responseReports = await fetch(`https://127.0.0.1:8393/api/report`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "include",
+      });
+
+      const valueReports = await responseReports.json();
+
+      if (responseReports.status == 204) {
+        setReports([]);
+      } else {
+        setReports(valueReports.data);
+      }
+    }
   }, []);
 
   const registerInput = (name, message, value) => {
@@ -111,8 +133,34 @@ const Profile = () => {
       });
   };
 
-  const deleteAd = async () => {
-    await fetch(`https://127.0.0.1:8393/api/ad?adId=${adSelected}`, {
+  const deleteAd = async (values) => {
+    await fetch(`https://127.0.0.1:8393/api/ad?adId=${values != null ? adSelected : values.listingid}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+    }).catch((e) => {
+      console.error(e);
+    });
+  };
+
+  const deleteUser = async (values) => {
+    await fetch(`https://127.0.0.1:8393/api/user?userId=${values.userid}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "include",
+    }).catch((e) => {
+      console.error(e);
+    });
+  };
+
+  const deleteReport = async (values) => {
+    await fetch(`https://127.0.0.1:8393/api/report?reportId=${values.reportId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +169,7 @@ const Profile = () => {
       credentials: "include",
     })
       .then(() => {
-        navigate("/profile?type=editlistings");
+        navigate("/profile?type=reports");
       })
       .catch((e) => {
         console.error(e);
@@ -172,6 +220,21 @@ const Profile = () => {
             <h1>Edit Listings</h1>
           </Link>
         </div>
+        {session.data.user_type === "admin" ? (
+          <div className="options">
+            <Link to="/profile?type=reports" style={{ textDecoration: "none", color: "white" }}>
+              <h1>Reports</h1>
+            </Link>
+            <Link to="/profile?type=deletead" style={{ textDecoration: "none", color: "white" }}>
+              <h1>Delete Ad</h1>
+            </Link>
+            <Link to="/profile?type=deleteuser" style={{ textDecoration: "none", color: "white" }}>
+              <h1>Delete User</h1>
+            </Link>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className="rightSide">
         {type === "editprofile" ? (
@@ -290,6 +353,45 @@ const Profile = () => {
                 <button className="deleteAdButton" type="a" onClick={deleteAd}>
                   Delete Ad!
                 </button>
+              </div>
+            </form>
+          </div>
+        ) : type === "deletead" ? (
+          <form onSubmit={handleSubmit(deleteAd)} class="deleteWrapper">
+            <input placeholder="Listing Id" {...registerInput("listingid", "Enter Listing Id", true)} />
+            {errors?.listingid && <small>{errors.listingid.message}</small>}
+            <div>
+              <button className="deleteAdButton">Delete Ad!</button>
+            </div>
+          </form>
+        ) : type === "deleteuser" ? (
+          <form onSubmit={handleSubmit(deleteUser)} class="deleteWrapper">
+            <input placeholder="User Id" {...registerInput("userid", "Enter User Id", true)} />
+            {errors?.userid && <small>{errors.userid.message}</small>}
+            <div>
+              <button className="deleteAdButton">Delete User!</button>
+            </div>
+          </form>
+        ) : type === "reports" ? (
+          <div>
+            <div className="reportWrapper">
+              {dataReports.map((e) => (
+                <div className="listingInfo">
+                  <h1 className="Id">Id: {e.id}</h1>
+                  <h1 className="User Reporting">User Reporting: {e.user_reporting}</h1>
+                  <h1 className="Ad Id">Ad Id: {e.ad_id}</h1>
+                  <h1 className="Ad Id">Content: {e.message_content}</h1>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => fileDownload(JSON.stringify({ data: dataReports }), "DataReport.json")}>
+              Download Reports!
+            </button>
+            <form onSubmit={handleSubmit(deleteReport)} class="deleteWrapper">
+              <input placeholder="Report Id" {...registerInput("reportId", "Enter Report Id", true)} />
+              {errors?.reportId && <small>{errors.reportId.message}</small>}
+              <div>
+                <button className="deleteAdButton">Delete Report!</button>
               </div>
             </form>
           </div>
