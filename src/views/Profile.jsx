@@ -115,14 +115,13 @@ const Profile = () => {
       mode: "cors",
       credentials: "include",
       body: JSON.stringify({
-        email: values.email,
         password: values.password,
         birthday: values.birthday,
         first_name: values.firstname,
         last_name: values.lastname,
         phone_number: values.phonenumber,
         company: values.company,
-        profile_picture: values.profilepicture,
+        profile_picture: values.imageFile[0],
       }),
     })
       .then(() => {
@@ -240,19 +239,6 @@ const Profile = () => {
         {type === "editprofile" ? (
           <form className="rightSide" onSubmit={handleSubmit(submitProfileChange)}>
             <div className="inputs">
-              <input
-                placeholder="Email"
-                {...register("email", {
-                  required: {
-                    message: "Email is required",
-                    value: true,
-                  },
-                  pattern: {
-                    value: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/g,
-                    message: "No valid email provided",
-                  },
-                })}
-              />
               {errors?.email && <small>{errors.email.message}</small>}
               <input placeholder="First name" {...registerInput("firstname", "Enter first Name", true)} />
               {errors?.firstname && <small>{errors.firstname.message}</small>}
@@ -264,7 +250,7 @@ const Profile = () => {
               {errors?.birthday && <small>{errors.birthday.message}</small>}
               <input placeholder="Company" {...registerInput("company", "Enter Company Name", true)} />
               {errors?.company && <small>{errors.company.message}</small>}
-              <input placeholder="Profile Picture Link" {...registerInput("profilepicture", "", false)} />
+              <input type="file" className="chooseFile" {...registerInput("imageFile", "Enter Image", false)} />
               <input
                 type="password"
                 placeholder="Password"
@@ -297,9 +283,7 @@ const Profile = () => {
                   }`}</h1>
                   <h1 className="authorTime">
                     Sent by:
-                    {`${e.userr_message_messengerTouserr.first_name} ${e.userr_message_messengerTouserr.last_name} ${
-                      e.userr_message_messengerTouserr.last_name
-                    }\n ${new Intl.DateTimeFormat("en-GB", {
+                    {`${e.userr_message_messengerTouserr.first_name} ${e.userr_message_messengerTouserr.last_name}\n ${new Intl.DateTimeFormat("en-GB", {
                       dateStyle: "full",
                       timeStyle: "long",
                     }).format(new Date(e.sent_at))}`}

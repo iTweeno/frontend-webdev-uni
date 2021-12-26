@@ -6,7 +6,9 @@
   margin: auto;
   align-items: center;
 }
-
+.chooseFile {
+  color: white;
+}
 .registerButton {
   margin-top: 30px;
   width: auto;

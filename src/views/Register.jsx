@@ -83,7 +83,7 @@ const Register = () => {
             {errors?.birthday && <small>{errors.birthday.message}</small>}
             <input placeholder="Company" {...registerInput("company", "Enter Company Name", true)} />
             {errors?.company && <small>{errors.company.message}</small>}
-            <input type="file" {...registerInput("imageFile", "Enter Image", false)} />
+            <input type="file" className="chooseFile" {...registerInput("imageFile", "Enter Image", false)} />
             <input
               type="password"
               placeholder="Password"
