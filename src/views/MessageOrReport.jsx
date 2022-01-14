@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useSession } from "../contexts/SessionContext";
 
 const MessageOrReport = () => {
-  const { handleSubmit, register, formState: { errors }, } = useForm();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
   const query = new URLSearchParams(window.location.search);
   const type = query.get("type");
@@ -51,9 +55,7 @@ const MessageOrReport = () => {
           placeholder="message"
         />
         {errors?.content && <small>{errors.content.message}</small>}
-        <button>
-          {type === "message" ? "Message Listing" : "Report Listing"}
-        </button>
+        <button>{type === "message" ? "Message Listing" : "Report Listing"}</button>
       </div>
     </form>
   );

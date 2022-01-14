@@ -14,7 +14,7 @@ const Listings = () => {
   const clickPagination = async (event) => {
     skip = event.selected;
     navigate(`/listings?title=${title}&skip=${skip}`);
-    getData()
+    getData();
   };
 
   const getData = async () => {

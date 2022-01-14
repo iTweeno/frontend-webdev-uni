@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import fileDownload from "js-file-download";
+import jsPDF from "jspdf";
 import { useState, useEffect } from "react";
 import "./Profile.css";
 import { useSession } from "../contexts/SessionContext";
@@ -43,12 +43,16 @@ const Profile = () => {
       setDataMessages([]);
     } else {
       const responseArrMessages = (await responseMessages.json()).data;
-      const sortedArray = responseArrMessages.filter(
-        (e, i) =>
-          responseArrMessages.indexOf(
-            responseArrMessages.find((ee) => [ee.messenger, ee.receiver].includes(e.messenger) && e.ad_id === ee.ad_id)
-          ) === i
-      );
+      const sortedArray = responseArrMessages
+        .reverse()
+        .filter(
+          (e, i) =>
+            responseArrMessages.indexOf(
+              responseArrMessages.find(
+                (ee) => [ee.messenger, ee.receiver].includes(e.messenger) && e.ad_id === ee.ad_id
+              )
+            ) === i
+        );
 
       setDataMessages(sortedArray);
     }
@@ -107,7 +111,7 @@ const Profile = () => {
   };
 
   const submitProfileChange = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/user?userId=${session.data.id}`, {
+    await fetch(`https://localhost:8393/api/user?userId=${session.data.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +137,7 @@ const Profile = () => {
   };
 
   const deleteAd = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/ad?adId=${values != null ? adSelected : values.listingid}`, {
+    await fetch(`https://localhost:8393/api/ad?adId=${values != null ? adSelected : values.listingid}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -146,7 +150,7 @@ const Profile = () => {
   };
 
   const deleteUser = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/user?userId=${values.userid}`, {
+    await fetch(`https://localhost:8393/api/user?userId=${values.userid}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -159,7 +163,7 @@ const Profile = () => {
   };
 
   const deleteReport = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/report?reportId=${values.reportId}`, {
+    await fetch(`https://localhost:8393/api/report?reportId=${values.reportId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -175,8 +179,19 @@ const Profile = () => {
       });
   };
 
+  const downloadPDF = async () => {
+    const doc = new jsPDF();
+    const textToWrite = dataReports.reduce(
+      (a, c) =>
+        a +
+        `Report Id:${c.report_id}\nUser Reporting:${c.user_reporting}\nAd Id:${c.ad_id}\nMessage:${c.message_content}\n\n`,
+      ""
+    );
+    doc.text(textToWrite, 10, 10);
+    doc.save("reports.pdf");
+  };
   const submitListingChanges = async (values) => {
-    await fetch(`https://127.0.0.1:8393/api/ad?adId=${adSelected}`, {
+    await fetch(`https://localhost:8393/api/ad?adId=${adSelected}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -237,7 +252,7 @@ const Profile = () => {
       </div>
       <div className="rightSide">
         {type === "editprofile" ? (
-          <form className="rightSide" onSubmit={handleSubmit(submitProfileChange)}>
+          <form className="editTab" onSubmit={handleSubmit(submitProfileChange)}>
             <div className="inputs">
               {errors?.email && <small>{errors.email.message}</small>}
               <input placeholder="First name" {...registerInput("firstname", "Enter first Name", true)} />
@@ -262,10 +277,10 @@ const Profile = () => {
                 })}
               />
               {errors?.password && <small>{errors.password.message}</small>}
+              <button className="registerButton" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Editing profile..." : "Edit Profile"}
+              </button>
             </div>
-            <button className="registerButton" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Editing profile..." : "Edit Profile"}
-            </button>
           </form>
         ) : type === "messages" ? (
           <div className="messagesWrapper">
@@ -283,7 +298,9 @@ const Profile = () => {
                   }`}</h1>
                   <h1 className="authorTime">
                     Sent by:
-                    {`${e.userr_message_messengerTouserr.first_name} ${e.userr_message_messengerTouserr.last_name}\n ${new Intl.DateTimeFormat("en-GB", {
+                    {`${e.userr_message_messengerTouserr.first_name} ${
+                      e.userr_message_messengerTouserr.last_name
+                    }\n ${new Intl.DateTimeFormat("en-GB", {
                       dateStyle: "full",
                       timeStyle: "long",
                     }).format(new Date(e.sent_at))}`}
@@ -341,7 +358,7 @@ const Profile = () => {
             </form>
           </div>
         ) : type === "deletead" ? (
-          <form onSubmit={handleSubmit(deleteAd)} class="deleteWrapper">
+          <form onSubmit={handleSubmit(deleteAd)} className="deleteWrapper">
             <input placeholder="Listing Id" {...registerInput("listingid", "Enter Listing Id", true)} />
             {errors?.listingid && <small>{errors.listingid.message}</small>}
             <div>
@@ -349,7 +366,7 @@ const Profile = () => {
             </div>
           </form>
         ) : type === "deleteuser" ? (
-          <form onSubmit={handleSubmit(deleteUser)} class="deleteWrapper">
+          <form onSubmit={handleSubmit(deleteUser)} className="deleteWrapper">
             <input placeholder="User Id" {...registerInput("userid", "Enter User Id", true)} />
             {errors?.userid && <small>{errors.userid.message}</small>}
             <div>
@@ -368,10 +385,8 @@ const Profile = () => {
                 </div>
               ))}
             </div>
-            <button onClick={() => fileDownload(JSON.stringify({ data: dataReports }), "DataReport.json")}>
-              Download Reports!
-            </button>
-            <form onSubmit={handleSubmit(deleteReport)} class="deleteWrapper">
+            <button onClick={downloadPDF}>Download Reports!</button>
+            <form onSubmit={handleSubmit(deleteReport)} className="deleteWrapper">
               <input placeholder="Report Id" {...registerInput("reportId", "Enter Report Id", true)} />
               {errors?.reportId && <small>{errors.reportId.message}</small>}
               <div>
